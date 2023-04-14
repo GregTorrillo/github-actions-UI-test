@@ -1,0 +1,32 @@
+name: UI Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      
+      - name: Install Dependencies
+        run: npm install
+      
+      - name: Start Application
+        run: npm start &
+        # The `&` runs the command in the background, so we can move on to the next step.
+      
+      - name: Wait for Application to Start
+        run: npx wait-on http://localhost:3000
+      
+      - name: Run End-to-End UI Tests
+        run: npx cypress run --browser chrome --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
+        # Replace "chrome" with the browser you want to use, and add your own Cypress Record key.
